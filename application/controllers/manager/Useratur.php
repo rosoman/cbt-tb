@@ -30,7 +30,7 @@ class Useratur extends Member_Controller {
             $query = $this->userlevel_model->get_level();
             $level_opsi = '';
 
-            if ($query->num_rows() > 0) {
+            /*if ($query->num_rows() > 0) {
                 $level_opsi = $level_opsi . '<select name="level" id="level" class="form-control input-sm">';
                 $level = $query->result();
                 
@@ -43,20 +43,20 @@ class Useratur extends Member_Controller {
                 $level_opsi = $level_opsi . '</select>';
             } else {
                 $level_opsi = '<input type="text" class="form-control input-sm" id="parent" name="parent" value="" readonly>';
-            }
+            }*/
 
-            // if($query->num_rows()>0){
-            //     $level_opsi = $level_opsi.'<select name="level" id="level" class="form-control input-sm">';
-            //     $level = $query->result();
-            //     foreach($level as $temp){
-            //         $level_opsi = $level_opsi.'
-            //             <option value="'.$temp->level.'">'.$temp->level.'</option>
-            //         ';
-            //     }
-            //     $level_opsi = $level_opsi.'</select>';
-            // }else{
-            //     $level_opsi = '<input type="text" class="form-control input-sm" id="parent" name="parent" value="" readonly>';
-            // }
+            if($query->num_rows()>0){
+                 $level_opsi = $level_opsi.'<select name="level" id="level" class="form-control input-sm">';
+                 $level = $query->result();
+                 foreach($level as $temp){
+                     $level_opsi = $level_opsi.'
+                         <option value="'.$temp->level.'">'.$temp->level.'</option>
+                     ';
+                 }
+                 $level_opsi = $level_opsi.'</select>';
+             }else{
+                 $level_opsi = '<input type="text" class="form-control input-sm" id="parent" name="parent" value="" readonly>';
+             }
             
 
 
