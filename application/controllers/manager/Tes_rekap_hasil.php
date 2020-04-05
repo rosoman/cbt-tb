@@ -25,6 +25,7 @@ class Tes_rekap_hasil extends Member_Controller {
     public function index(){
 		$data['kode_menu'] = $this->kode_menu;
         $data['url'] = $this->url;
+        $id_grup = $this->access->get_opsi2();
 
         $username = $this->access->get_username();
 		$user_id = $this->users_model->get_login_info($username)->id;
@@ -34,7 +35,12 @@ class Tes_rekap_hasil extends Member_Controller {
         
         $data['rentang_waktu'] = $tanggal_awal.' - '.$tanggal_akhir;
 
-        $query_group = $this->cbt_user_grup_model->get_group();
+        if(empty($id_grup)){
+            $query_group = $this->cbt_user_grup_model->get_group();
+        }else{
+            $query_group = $this->cbt_user_grup_model->get_group_by_id($id_grup);
+        }
+
         $select = '';
         if($query_group->num_rows()>0){
         	$query_group = $query_group->result();

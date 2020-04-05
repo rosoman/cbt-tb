@@ -126,18 +126,21 @@ class Cbt_tes_user_model extends CI_Model{
     */
 
     function get_by_group_id($group_id){
-        $id_ex = explode(',',$group_id);
-        $q = "";
-        //echo "<H1>$id_ex[0]</H1>";
-        
-            $q = "cbt_user.user_grup_id IN('".$id_ex[0]."'";
-            if(count($id_ex)>1){
-                for($i=1 ; $i<count($id_ex) ; $i++) {
-                    # code...
-                    $q .= ",'".$id_ex[$i]."'";
+        $q = "cbt_user.user_grup_id like '%%'";
+        if(!empty($group_id)){
+            $id_ex = explode(',',$group_id);
+            
+            //echo "<H1>$id_ex[0]</H1>";
+            
+                $q = "cbt_user.user_grup_id IN('".$id_ex[0]."'";
+                if(count($id_ex)>1){
+                    for($i=1 ; $i<count($id_ex) ; $i++) {
+                        # code...
+                        $q .= ",'".$id_ex[$i]."'";
+                    }
                 }
-            }
-            $q .= ")";
+                $q .= ")";
+        }
 
         $this->db->from($this->table)
                  ->join('cbt_tes', 'cbt_tes_user.tesuser_tes_id = cbt_tes.tes_id')
@@ -198,11 +201,14 @@ class Cbt_tes_user_model extends CI_Model{
 	
     // Ngerubah fungsi parameternya
 	function get_datatable($start, $rows, $tes_id, $grup_id, $urutkan, $tanggal, $id_grup){
+        $q = "cbt_user.user_grup_id like '%%'";
+        if(!empty($id_grup)){
+
+            $id_ex = explode(',',$id_grup);
         
-        $id_ex = explode(',',$id_grup);
-        $q = "";
+
+        
         //echo "<H1>$id_ex[0]</H1>";
-        
             $q = "cbt_user.user_grup_id IN('".$id_ex[0]."'";
             if(count($id_ex)>1){
                 for($i=1 ; $i<count($id_ex) ; $i++) {
@@ -211,7 +217,7 @@ class Cbt_tes_user_model extends CI_Model{
                 }
             }
             $q .= ")";
-
+        }
     
         $sql = '';
         if($tes_id!='semua'){
@@ -244,6 +250,7 @@ class Cbt_tes_user_model extends CI_Model{
                  ->group_by('cbt_tes_user.tesuser_id')
 				 ->order_by($order)
                  ->limit($rows, $start);
+        
         return $this->db->get();
 
 
