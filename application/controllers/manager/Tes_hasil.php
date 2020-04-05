@@ -9,7 +9,8 @@ class Tes_hasil extends Member_Controller {
 	private $kode_menu = 'tes-hasil';
 	private $kelompok = 'tes';
 	private $url = 'manager/tes_hasil';
-	
+    private $id_grup;
+
     function __construct(){
 		parent:: __construct();
 		$this->load->model('cbt_user_model');
@@ -25,18 +26,24 @@ class Tes_hasil extends Member_Controller {
 		$this->load->model('cbt_tes_soal_jawaban_model');
 
         parent::cek_akses($this->kode_menu);
+        
 	}
 	
     public function index($page=null, $id=null){
         $data['kode_menu'] = $this->kode_menu;
         $data['url'] = $this->url;
+        $id_grup = $this->access->get_opsi2();
 
         $tanggal_awal = date('Y-m-d H:i', strtotime('- 1 days'));
         $tanggal_akhir = date('Y-m-d H:i', strtotime('+ 1 days'));
         
         $data['rentang_waktu'] = $tanggal_awal.' - '.$tanggal_akhir;
-
-        $query_group = $this->cbt_user_grup_model->get_group();
+        if(empty($id_grup)){
+            $query_group = $this->cbt_user_grup_model->get_group();
+        }else{
+            $query_group = $this->cbt_user_grup_model->get_group_by_id($id_grup);
+        }
+        
         $select = '<option value="semua">Semua Kelas</option>';
         if($query_group->num_rows()>0){
         	$query_group = $query_group->result();
@@ -49,7 +56,15 @@ class Tes_hasil extends Member_Controller {
         }
         $data['select_group'] = $select;
 
-        $query_tes = $this->cbt_tes_user_model->get_by_group();
+        // TAMBAHAN KLO ANU YA ANU
+
+        if(empty($id_grup)){
+            $query_tes = $this->cbt_tes_user_model->get_by_group();
+        }else{
+            $query_tes = $this->cbt_tes_user_model->get_by_group_id($id_grup);
+        }
+
+        
         $select = '<option value="semua">Semua Tes</option>';
         if($query_tes->num_rows()>0){
         	$query_tes = $query_tes->result();
@@ -175,6 +190,14 @@ class Tes_hasil extends Member_Controller {
         }
     }
     
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
     function get_datatable(){
 		// variable initialization
 		$tes_id = $this->input->get('tes');
@@ -182,6 +205,8 @@ class Tes_hasil extends Member_Controller {
 		$urutkan = $this->input->get('urutkan');
 		$waktu = $this->input->get('waktu');
 		$tanggal = explode(" - ", $waktu);
+
+        $id_grup = $this->access->get_opsi2();
 
 		$search = "";
 		$start = 0;
@@ -197,7 +222,7 @@ class Tes_hasil extends Member_Controller {
 		$rows = $this->get_rows();
 
 		// run query to get user listing
-		$query = $this->cbt_tes_user_model->get_datatable($start, $rows, $tes_id, $grup_id, $urutkan, $tanggal);
+		$query = $this->cbt_tes_user_model->get_datatable($start, $rows, $tes_id, $grup_id, $urutkan, $tanggal, $id_grup);
 		$iFilteredTotal = $query->num_rows();
 		
 		$iTotal= $this->cbt_tes_user_model->get_datatable_count($tes_id, $grup_id, $urutkan, $tanggal)->row()->hasil;

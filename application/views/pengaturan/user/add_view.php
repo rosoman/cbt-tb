@@ -259,7 +259,7 @@
             $('#opsi1').val('');
         });
 
-        $('#btn-topik-hapus').click(function(){
+        $('#btn-kelas-hapus').click(function(){
             $('#opsi2').val('');
         });
 

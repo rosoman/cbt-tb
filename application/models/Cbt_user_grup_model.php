@@ -66,4 +66,26 @@ class Cbt_user_grup_model extends CI_Model{
                  ->from($this->table);
         return $this->db->get();
 	}
+
+    function get_group_by_id($id_group){
+       // echo "<H1>$id_group</H1>";
+        $id_ex = explode(',',$id_group);
+        $q = "";
+        //echo "<H1>$id_ex[0]</H1>";
+        
+            $q = "grup_id IN('".$id_ex[0]."'";
+            if(count($id_ex)>1){
+                for($i=1 ; $i<count($id_ex) ; $i++) {
+                    # code...
+                    $q .= ",'".$id_ex[$i]."'";
+                }
+            }
+            $q .= ")";
+        
+        //echo "<H1>$q</H1>";
+        $this->db->where('('.$q.')')
+                 ->from($this->table)
+                 ->order_by('grup_nama', 'ASC');
+        return $this->db->get();
+    }
 }

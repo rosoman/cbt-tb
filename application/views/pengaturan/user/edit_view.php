@@ -69,12 +69,30 @@
                                         <p class="help-block">Jika kosong, maka user dapat mengelola soal semua topik.</p>
                                     </div>
                                 </div>
+
+
+                                <div class="form-group">
+                            <label class="col-sm-3 control-label">Opsi 2</label>
+                            <div class="col-sm-9">
+                                <div class="input-group input-group-sm">
+                                    <input type="text" class="form-control" value="<?php if(!empty($opsi2)){ echo $opsi2; } ?>" id="opsi2" name="opsi2" placeholder="Daftar kelas yang akan dikelola Pengawas" readonly="">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-info btn-flat" type="button" id="btn-kelas">Daftar Kelas</button>
+                                        <button class="btn btn-default btn-flat" type="button" id="btn-kelas-hapus">Hapus</button>
+                                    </span>
+                                </div>
+                                
+                            </div>
+                        </div>
+
+                            <!--
                                 <div class="form-group">
                                     <label class="col-sm-3 control-label">Opsi 2</label>
                                     <div class="col-sm-5">
                                         <input type="text" class="form-control input-sm" value="<?php if(!empty($opsi2)){ echo $opsi2; } ?>" id="opsi2" name="opsi2" placeholder="Opsi 2">
                                     </div>
                                 </div>
+                            -->
                                 <div class="form-group">
                                     <label class="col-sm-3 control-label">Keterangan</label>
                                     <div class="col-sm-9">
@@ -150,6 +168,49 @@
         </div>
 </div>
 
+
+<div class="modal" id="modal-kelas" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button class="close" type="button" data-dismiss="modal">&times;</button>
+                    <div id="trx-judul">Pilih Topik</div>
+                </div>
+                <div class="modal-body">
+                    <div class="row-fluid">
+                        <div class="box-body form-horizontal">
+                            <div id="form-pesan-kelas"></div>
+                            
+
+                            <table id="table-kelas" class="table table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th>No.</th>
+                                    <th class="all">Kelas</th>
+                                    <th class="all"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td> </td>
+                                    <td> </td>
+                                    <td> </td>
+ 
+                                </tr>
+                            </tbody>
+                        </table> 
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="#" class="btn btn-primary" data-dismiss="modal">Close</a>
+                </div>
+            </div>
+        </div>
+</div>
+
+
+
 </section><!-- /.content -->
 
 <script lang="javascript">
@@ -179,6 +240,33 @@
             notify_success('Topik '+topik_nama+' berhasil ditambahkan');
         }
     }
+
+
+function tambah_kelas(kelas_id, kelas_nama){
+        var daftar_kelas = $('#opsi2').val();
+        if(daftar_kelas.length>0){
+            var array_kelas = daftar_kelas.split(','), i;
+            var counter=0;
+            for(i=0;i<array_kelas.length;i++){
+                if(kelas_id==array_kelas[i]){
+                    counter++;   
+                }
+            }
+            if(counter>0){
+                notify_error('Topik '+kelas_nama+' sudah berada di Opsi2');
+            }else{
+                daftar_kelas = daftar_kelas+","+kelas_id;
+                $('#opsi2').val(daftar_kelas);
+                notify_success('Topik '+kelas_nama+' berhasil ditambahkan');
+            }
+        }else{
+            daftar_kelas = kelas_id;
+            $('#opsi2').val(daftar_kelas);
+            notify_success('Topik '+kelas_nama+' berhasil ditambahkan');
+        }
+    }
+
+
     $(function(){
         $('#btn-topik-hapus').click(function(){
             $('#opsi1').val('');
@@ -186,6 +274,16 @@
         $('#btn-topik').click(function(){
             $("#modal-topik").modal('show');
         });
+
+        $('#btn-kelas-hapus').click(function(){
+            $('#opsi2').val('');
+        });
+
+        $('#btn-kelas').click(function(){
+            $('#form-pesan-kelas').html('');
+            $("#modal-kelas").modal('show');
+        });
+
         // memilih topik berdasarkan modul
         $("#topik-modul").change(function(){
             refresh_table();
@@ -240,6 +338,23 @@
                   "fnServerParams": function ( aoData ) {
                     aoData.push( { "name": "modul", "value": $('#topik-modul').val()} );
                   }
-         }); 
+         });
+
+         $('#table-kelas').DataTable({
+                  "paging": true,
+                  "iDisplayLength":10,
+                  "bServerSide": true, 
+                  "searching": true,
+                  "aoColumns": [
+                        {"bSearchable": false, "bSortable": false, "sWidth":"10px"},
+                        {"bSearchable": false, "bSortable": false, "sWidth":"100%"},
+                        {"bSearchable": false, "bSortable": false},
+                        ],
+                  "sAjaxSource": "<?php echo site_url().'/'.$url; ?>/get_datatable_kelas/",
+                  "autoWidth": false
+                  //"fnServerParams": function ( aoData ) {
+                  //  aoData.push( { "name": "modul", "value": $('#kelas-modul').val()} );
+                  //}
+         });     
     });
 </script>

@@ -119,6 +119,34 @@ class Cbt_tes_user_model extends CI_Model{
                  ->group_by('tesuser_tes_id');
         return $this->db->get();
     }
+
+
+    /*
+        SELECT * FROM cbt_tes_user JOIN cbt_tes on cbt_tes_user.tesuser_tes_id = cbt_tes.tes_id JOIN cbt_user ON cbt_user.user_id=cbt_tes_user.tesuser_user_id WHERE cbt_user.user_grup_id=46 GROUP BY cbt_tes.tes_id order BY tes_id ASC 
+    */
+
+    function get_by_group_id($group_id){
+        $id_ex = explode(',',$group_id);
+        $q = "";
+        //echo "<H1>$id_ex[0]</H1>";
+        
+            $q = "cbt_user.user_grup_id IN('".$id_ex[0]."'";
+            if(count($id_ex)>1){
+                for($i=1 ; $i<count($id_ex) ; $i++) {
+                    # code...
+                    $q .= ",'".$id_ex[$i]."'";
+                }
+            }
+            $q .= ")";
+
+        $this->db->from($this->table)
+                 ->join('cbt_tes', 'cbt_tes_user.tesuser_tes_id = cbt_tes.tes_id')
+                 ->join('cbt_user', 'cbt_user.user_id=cbt_tes_user.tesuser_user_id')
+                 ->where('('.$q.')')
+                 ->order_by('tes_id', 'ASC')
+                 ->group_by('cbt_tes.tes_id');
+        return $this->db->get();
+    }
 	
 	function get_by_kolom_limit($kolom, $isi, $limit){
         $this->db->where($kolom, $isi)
@@ -168,7 +196,23 @@ class Cbt_tes_user_model extends CI_Model{
         return $this->db->get();
     }
 	
-	function get_datatable($start, $rows, $tes_id, $grup_id, $urutkan, $tanggal){
+    // Ngerubah fungsi parameternya
+	function get_datatable($start, $rows, $tes_id, $grup_id, $urutkan, $tanggal, $id_grup){
+        
+        $id_ex = explode(',',$id_grup);
+        $q = "";
+        //echo "<H1>$id_ex[0]</H1>";
+        
+            $q = "cbt_user.user_grup_id IN('".$id_ex[0]."'";
+            if(count($id_ex)>1){
+                for($i=1 ; $i<count($id_ex) ; $i++) {
+                    # code...
+                    $q .= ",'".$id_ex[$i]."'";
+                }
+            }
+            $q .= ")";
+
+    
         $sql = '';
         if($tes_id!='semua'){
             $sql = ' AND tesuser_tes_id="'.$tes_id.'"';
@@ -190,6 +234,7 @@ class Cbt_tes_user_model extends CI_Model{
         }
 
 		$this->db->select('cbt_tes_user.*,cbt_user_grup.grup_nama, cbt_tes.*, cbt_user.*, SUM(`cbt_tes_soal`.`tessoal_nilai`) AS nilai ')
+                 ->where($q)
                  ->where('(tesuser_creation_time>="'.$tanggal[0].'" AND tesuser_creation_time<="'.$tanggal[1].'" '.$sql.' )')
                  ->from($this->table)
                  ->join('cbt_user', 'cbt_tes_user.tesuser_user_id = cbt_user.user_id')
@@ -200,6 +245,22 @@ class Cbt_tes_user_model extends CI_Model{
 				 ->order_by($order)
                  ->limit($rows, $start);
         return $this->db->get();
+
+
+        /*
+        $this->db->select('cbt_tes_user.*,cbt_user_grup.grup_nama, cbt_tes.*, cbt_user.*, SUM(`cbt_tes_soal`.`tessoal_nilai`) AS nilai ')
+                 ->where($q)
+                 ->where('(tesuser_creation_time>="'.$tanggal[0].'" AND tesuser_creation_time<="'.$tanggal[1].'" '.$sql.' )')
+                 ->from($this->table)
+                 ->join('cbt_user', 'cbt_tes_user.tesuser_user_id = cbt_user.user_id')
+                 ->join('cbt_user_grup', 'cbt_user.user_grup_id = cbt_user_grup.grup_id')
+                 ->join('cbt_tes', 'cbt_tes_user.tesuser_tes_id = cbt_tes.tes_id')
+                 ->join('cbt_tes_soal', 'cbt_tes_soal.tessoal_tesuser_id = cbt_tes_user.tesuser_id')
+                 ->group_by('cbt_tes_user.tesuser_id')
+                 ->order_by($order)
+                 ->limit($rows, $start);
+        return $this->db->get();
+        */
 	}
     
     function get_datatable_count($tes_id, $grup_id, $urutkan, $tanggal){
