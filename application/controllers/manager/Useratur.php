@@ -13,6 +13,8 @@ class Useratur extends Member_Controller {
 
         $this->load->model('cbt_modul_model');
         $this->load->model('cbt_topik_model');
+        //TAMABH INI
+        $this->load->model('cbt_user_grup_model');
 	}
     
     public function index($page=null, $id=null){
@@ -63,6 +65,8 @@ class Useratur extends Member_Controller {
             $data['level_opsi'] = $level_opsi; 
             
             $this->template->display_admin('pengaturan/user/add_view', 'Tambah User', $data);
+
+
         }else if($page=="edit"){
             parent::cek_akses_crud($data['kode_menu'], 1);
             $this->load->helper('form');
@@ -306,6 +310,56 @@ class Useratur extends Member_Controller {
             $record[] = $temp->topik_nama;
             $record[] = $temp->topik_detail;
             $record[] = '<a onclick="tambah_topik(\''.$temp->topik_id.'\', \''.addslashes($temp->topik_nama).'\')" style="cursor: pointer;" class="btn btn-default btn-xs">Tambah</a>';
+
+            $output['aaData'][] = $record;
+        }
+        // format it to JSON, this output will be displayed in datatable
+        
+        echo json_encode($output);
+    }
+
+    // TAMBAH INI BUAT KELAS
+
+    function get_datatable_kelas(){
+        // variable initialization
+        $modul = $this->input->get('modul');
+
+        $search = "";
+        $start = 0;
+        $rows = 10;
+
+        // get search value (if any)
+        if (isset($_GET['sSearch']) && $_GET['sSearch'] != "" ) {
+            $search = $_GET['sSearch'];
+        }
+
+        // limit
+        $start = $this->get_start();
+        $rows = $this->get_rows();
+
+        // run query to get user listing
+        $query = $this->cbt_user_grup_model->get_datatable($start, $rows, 'grup_nama', $search);
+        $iFilteredTotal = $query->num_rows();
+        
+        $iTotal= $this->cbt_user_grup_model->get_datatable_count('grup_nama', $search)->row()->hasil;
+        
+        $output = array(
+            "sEcho" => intval($_GET['sEcho']),
+            "iTotalRecords" => $iTotal,
+            "iTotalDisplayRecords" => $iTotal,
+            "aaData" => array()
+        );
+
+        // get result after running query and put it in array
+        $i=$start;
+        $query = $query->result();
+        foreach ($query as $temp) {         
+            $record = array();
+            
+            $record[] = ++$i;
+            $record[] = $temp->grup_nama;
+            //$record[] = $temp->group_detail;
+            $record[] = '<a onclick="tambah_kelas(\''.$temp->grup_id.'\', \''.addslashes($temp->grup_nama).'\')" style="cursor: pointer;" class="btn btn-default btn-xs">Tambah</a>';
 
             $output['aaData'][] = $record;
         }
