@@ -19,6 +19,13 @@ class Peserta_daftar extends Member_Controller {
 
         $query_group = $this->cbt_user_grup_model->get_group();
 
+        // Atur berdasarkan akses crud untuk tombol tambah dan pilih semua
+        $is_edit = $this->access->cek_akses_crud($this->kode_menu,1);
+        $is_add = $this->access->cek_akses_crud($this->kode_menu,0);
+
+        $data['is_edit'] = $is_edit;
+        $data['is_add'] = $is_add;
+
         if($query_group->num_rows()>0){
         	$select = '';
         	$query_group = $query_group->result();
@@ -159,6 +166,9 @@ class Peserta_daftar extends Member_Controller {
 		// variable initialization
 		$group = $this->input->get('group');
 
+		// Tambahkan var untuk menentukan bisa edit atau tidak
+		$is_edit = $this->access->cek_akses_crud($this->kode_menu, 1);
+
 		$search = "";
 		$start = 0;
 		$rows = 10;
@@ -198,10 +208,13 @@ class Peserta_daftar extends Member_Controller {
             $query_group = $this->cbt_user_grup_model->get_by_kolom_limit('grup_id', $temp->user_grup_id, 1)->row();
 
             $record[] = $query_group->grup_nama;
-
-            $record[] = '<a onclick="edit(\''.$temp->user_id.'\')" style="cursor: pointer;" class="btn btn-default btn-xs">Edit</a>';
-            $record[] = '<input type="checkbox" name="edit-user-id['.$temp->user_id.']" >';
-
+            if($is_edit){
+            	$record[] = '<a onclick="edit(\''.$temp->user_id.'\')" style="cursor: pointer;" class="btn btn-default btn-xs">Edit</a>';
+            	$record[] = '<input type="checkbox" name="edit-user-id['.$temp->user_id.']" >';
+            }else{
+            	$record[] = '-';
+            	$record[] = '-';
+            }
 			$output['aaData'][] = $record;
 		}
 		// format it to JSON, this output will be displayed in datatable

@@ -42,8 +42,12 @@
     						<div class="box-title">Daftar Peserta</div>
     						<div class="box-tools pull-right">
     							<div class="dropdown pull-right">
-    								<a style="cursor: pointer;" onclick="tambah()">Tambah Peserta</a>
-    							</div>
+                                    <?php if($is_add){ ?>
+    								    <a style="cursor: pointer;" onclick="tambah()">Tambah Peserta</a>
+    							     <?php }else{?>
+                                        <a style="cursor: pointer;" onclick="tambahE()">Tambah Peserta</a>
+                                     <?php } ?>
+                                </div>
     						</div>
                     </div><!-- /.box-header -->
 
@@ -75,8 +79,13 @@
                         </form>                      
                     </div>
                     <div class="box-footer">
+                        <?php if ($is_edit) {
+                        ?>
                         <button type="button" id="btn-edit-hapus" class="btn btn-primary" title="Hapus Siswa yang dipilih">Hapus</button>
                         <button type="button" id="btn-edit-pilih" class="btn btn-default pull-right">Pilih Semua</button>
+                        <?php
+                            }
+                        ?>
                     </div>
                 </div>
         </div>
@@ -108,7 +117,7 @@
     </div>
 
     <div class="modal" id="modal-tambah" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
-    <?php echo form_open($url.'/tambah','id="form-tambah"'); ?>
+    <?php if($is_add){echo form_open($url.'/tambah','id="form-tambah"'); } ?>
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -203,6 +212,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
+                    
+                    
                     <button type="button" id="edit-hapus" class="btn btn-default pull-left">Hapus</button>
                     <button type="button" id="edit-simpan" class="btn btn-primary">Simpan</button>
                     <a href="#" class="btn btn-primary" data-dismiss="modal">Close</a>
@@ -221,6 +232,7 @@
         $('#table-peserta').dataTable().fnReloadAjax();
     }
 
+    <?php if($is_add){ ?>
     function tambah(){
         $('#form-pesan').html('');
         $('#tambah-username').val('');
@@ -231,10 +243,15 @@
         $("#modal-tambah").modal("show");
         $('#tambah-username').focus();
     }
+        <?php }else{?>
+    function tambahE(){
+        alert('Anda tidak diberikan Akses ke menu ini!');
+    }
+        <?php } ?>
 
     function edit(id){
         $("#modal-proses").modal('show');
-        $.getJSON('<?php echo site_url().'/'.$url; ?>/get_by_id/'+id+'', function(data){
+        $.getJSON('<?php if($is_edit){echo site_url().'/'.$url.'/get_by_id/'; }?>'+id+'', function(data){
             if(data.data==1){
                 $('#edit-id').val(data.id);
                 $('#edit-username').val(data.username);
